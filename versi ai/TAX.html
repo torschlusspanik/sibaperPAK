@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIBAPER AI - Sistem Pajak Kendaraan Berbasis Artificial Intelligence</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
+            z-index: -2;
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(30px);
+            border-radius: 30px;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            position: relative;
+        }
+        
+        .ai-logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin-bottom: 25px;
+            position: relative;
+            animation: aiPulse 3s ease-in-out infinite;
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+        
+        .ai-logo::before {
+            content: '🧠';
+            font-size: 50px;
+            position: absolute;
+            animation: brainFloat 2s ease-in-out infinite;
+        }
+        
+        .ai-logo::after {
+            content: '⚡';
+            font-size: 25px;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            border-radius: 50%;
+            padding: 5px;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.6);
+            animation: sparkle 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes aiPulse {
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4), 0 0 0 0 rgba(102, 126, 234, 0.7); 
+            }
+            50% { 
+                transform: scale(1.05); 
+                box-shadow: 0 20px 40px rgba(102, 126, 234, 0.6), 0 0 0 20px rgba(102, 126, 234, 0); 
+            }
+        }
+        
+        @keyframes brainFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-3px) rotate(2deg); }
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: scale(1.2) rotate(180deg); opacity: 0.8; }
+        }
+        
+        .main-title {
+            font-size: 3.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            letter-spacing: -1px;
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+        
+        .ai-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(76, 175, 80, 0.2);
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .ai-status::before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: #4caf50;
+            border-radius: 50%;
+            animation: blink 2s ease-in-out infinite;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.8);
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; transform: scale(1); }
+            51%, 100% { opacity: 0.3; transform: scale(0.8); }
+        }
+        
+        .form-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .form-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+        
+        .form-header h2 {
+            color: #2d3748;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 35px;
+        }
+        
+        .form-group {
+            position: relative;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1rem;
+            letter-spacing: 0.3px;
+        }
+        
+        .ai-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 0.7rem;
+            padding: 3px 10px;
+            border-radius: 15px;
+            margin-left: 10px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        
+        .form-input, .form-select {
+            width: 100%;
+            padding: 18px 20px;
+            border: 2px solid rgba(226, 232, 240, 0.8);
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            color: #2d3748;
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 
+                0 0 0 4px rgba(102, 126, 234, 0.15),
+                0 8px 25px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 1);
+        }
+        
+        .form-input.with-icon {
+            padding-left: 55px;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 22px;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus + .input-icon,
+        .form-input:not(:placeholder-shown) + .input-icon {
+            opacity: 1;
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 35px;
+            border: none;
+            border-radius: 18px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+        
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+        
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.8;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading-spinner {
+            width: 22px;
+            height: 22px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .results-section {
+            display: none;
+            animation: resultsAppear 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .results-section.show {
+            display: block;
+        }
+        
+        @keyframes resultsAppear {
+            0% {
+                opacity: 0;
+                transform: translateY(50px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .main-result {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 50px;
+            border-radius: 30px;
+            text-align: center;
+            margin-bottom: 40px;
+            box-shadow: 
+                0 25px 60px rgba(102, 126, 234, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .main-result::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.05) 50%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        .result-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .total-amount {
+            font-size: 4rem;
+            font-weight: 900;
+            margin: 25px 0;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            animation: amountPulse 2s ease-in-out infinite;
+            letter-spacing: -2px;
+        }
+        
+        @keyframes amountPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        .vehicle-info {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+        }
+        
+        .ai-analysis-grid {
+            display: grid;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .analysis-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 35px;
+            border-radius: 25px;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border-left: 6px solid;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+        }
+        
+        .analysis-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            animation: cardShine 2s ease-in-out infinite;
+        }
+        
+        @keyframes cardShine {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+        
+        .analysis-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+        
+        .risk-low { 
+            border-left-color: #4caf50; 
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.05) 0%, rgba(255, 255, 255, 0.95) 100%);
+        }
+        .risk-medium { 
+            border-left-color: #ff9800; 
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.05) 0%, rgba(255, 255, 255, 0.95) 100%);
+        }
+        .risk-high { 
+            border-left-color: #f44336; 
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.05) 0%, rgba(255, 255, 255, 0.95) 100%);
+        }
+        
+        .analysis-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .analysis-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2d3748;
+            letter-spacing: 0.5px;
+        }
+        
+        .risk-indicator {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .risk-item {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .risk-item:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: translateY(-2px);
+        }
+        
+        .risk-label {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .risk-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-transform: capitalize;
+        }
+        
+        .risk-low .risk-value { color: #4caf50; }
+        .risk-medium .risk-value { color: #ff9800; }
+        .risk-high .risk-value { color: #f44336; }
+        
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .insight-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .insight-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(102, 126, 234, 0.02) 50%, transparent 100%);
+            pointer-events: none;
+        }
+        
+        .insight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+        
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .insight-icon {
+            font-size: 28px;
+            padding: 12px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 15px;
+        }
+        
+        .insight-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        
+        .prediction-item, .recommendation-item, .trend-item {
+            padding: 25px;
+            border-radius: 18px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            border-left: 4px solid;
+            position: relative;
+        }
+        
+        .prediction-item {
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.08) 0%, rgba(255, 255, 255, 0.9) 100%);
+            border-left-color: #ff9800;
+        }
+        
+        .recommendation-item.high {
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.08) 0%, rgba(255, 255, 255, 0.9) 100%);
+            border-left-color: #f44336;
+        }
+        
+        .recommendation-item.medium {
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.08) 0%, rgba(255, 255, 255, 0.9) 100%);
+            border-left-color: #ff9800;
+        }
+        
+        .recommendation-item.low {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.08) 0%, rgba(255, 255, 255, 0.9) 100%);
+            border-left-color: #4caf50;
+        }
+        
+        .trend-item {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(255, 255, 255, 0.9) 100%);
+            border-left-color: #667eea;
+        }
+        
+        .item-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        
+        .item-description {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+        
+        .item-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .priority-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        
+        .badge-high {
+            background: linear-gradient(135deg, #ffcdd2 0%, #ef9a9a 100%);
+            color: #c62828;
+        }
+        
+        .badge-medium {
+            background: linear-gradient(135deg, #ffe0b2 0%, #ffcc02 100%);
+            color: #ef6c00;
+        }
+        
+        .badge-low {
+            background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+            color: #2e7d32;
+        }
+        
+        .calculation-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(20px);
+            margin-top: 20px;
+        }
+        
+        .calculation-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .calculation-table td {
+            padding: 20px 25px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .calculation-table tr:hover {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            transform: scale(1.01);
+        }
+        
+        .total-row {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            font-weight: 800 !important;
+            font-size: 1.2rem !important;
+        }
+        
+        .total-row td {
+            border-bottom: none;
+            padding: 25px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        
+        .currency {
+            font-weight: 700;
+            color: #2e7d32;
+            font-size: 1.1rem;
+        }
+        
+        .total-row .currency {
+            color: white;
+            font-size: 1.4rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid, .insights-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-title {
+                font-size: 2.2rem;
+            }
+            
+            .total-amount {
+                font-size: 2.8rem;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .risk-indicator {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header-card">
+            <div class="ai-logo"></div>
+            <h1 class="main-title">SIBAPER AI</h1>
+            <p class="subtitle">Sistem Pajak Kendaraan Berbasis Artificial Intelligence</p>
+            <div class="ai-status">AI Engine Active</div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="form-card">
+            <div class="form-header">
+                <span style="font-size: 28px;">🧮</span>
+                <h2>Input Data Kendaraan dengan AI Analysis</h2>
+            </div>
+            
+            <form id="taxForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Jenis Kendaraan *</label>
+                        <select id="jns_kend" class="form-select" required>
+                            <option value="">-- Pilih Jenis Kendaraan --</option>
+                            <option value="R2">🏍️ R2 - Roda 2 (Motor)</option>
+                            <option value="R4">🚗 R4 - Roda 4 (Mobil)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">PKB Pokok (Rp) *</label>
+                        <input type="number" id="pkb_pokok" class="form-input with-icon" min="0" step="1000" 
+                               placeholder="Contoh: 500000" required>
+                        <span class="input-icon">💵</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Masa Berlaku Pajak *</label>
+                        <input type="date" id="m_berlaku" class="form-input with-icon" required>
+                        <span class="input-icon">📅</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Masa Berlaku STNK *</label>
+                        <input type="date" id="m_stnk" class="form-input with-icon" required>
+                        <span class="input-icon">📅</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            Tahun Kendaraan
+                            <span class="ai-badge">AI Analysis</span>
+                        </label>
+                        <input type="number" id="tahun_kendaraan" class="form-input" min="1980" max="2024" 
+                               placeholder="Contoh: 2020">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            CC Mesin
+                            <span class="ai-badge">AI Analysis</span>
+                        </label>
+                        <input type="number" id="cc_engine" class="form-input" min="50" 
+                               placeholder="Contoh: 150 (motor) / 1500 (mobil)">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Lokasi Domisili
+                        <span class="ai-badge">Smart Recommendations</span>
+                    </label>
+                    <input type="text" id="lokasi_domisili" class="form-input" 
+                           placeholder="Contoh: Jakarta Selatan, Surabaya, Bandung">
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span id="btnText">🧠 Analisis dengan AI</span>
+                    <div id="loadingSpinner" class="loading-spinner hidden"></div>
+                </button>
+            </form>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="results-section">
+            <!-- Results will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <script>
+        // Initialize default dates
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const oneYearAgo = new Date();
+            oneYearAgo.setFullYear(today.getFullYear() - 1);
+            const fiveYearsLater = new Date();
+            fiveYearsLater.setFullYear(today.getFullYear() + 5);
+            
+            document.getElementById('m_berlaku').value = oneYearAgo.toISOString().split('T')[0];
+            document.getElementById('m_stnk').value = fiveYearsLater.toISOString().split('T')[0];
+        });
+
+        // Utility functions
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(amount);
+        }
+        
+        function calculateYearsDifference(dateFrom, dateTo) {
+            const from = new Date(dateFrom);
+            const to = new Date(dateTo);
+            const diffTime = to - from;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays > 0) {
+                const years = Math.ceil(diffDays / 365);
+                return Math.max(1, years);
+            }
+            return 1;
+        }
+
+        // AI Analysis Functions
+        function generateAIInsights(calculatedData, formData) {
+            const insights = {
+                riskLevel: calculatedData.telatPajak > 2 ? 'high' : calculatedData.telatPajak > 1 ? 'medium' : 'low',
+                predictions: [],
+                recommendations: [],
+                trends: [],
+                smartAlerts: []
+            };
+
+            // Risk Assessment
+            if (calculatedData.telatPajak > 2) {
+                insights.predictions.push({
+                    title: 'Prediksi Denda Tambahan',
+                    description: `Berdasarkan analisis AI, tunggakan ${calculatedData.telatPajak} tahun dapat mengakibatkan denda tambahan hingga 25% dari total pajak.`,
+                    confidence: 85
+                });
+                
+                insights.recommendations.push({
+                    priority: 'high',
+                    action: 'Segera Bayar Pajak',
+                    reason: 'Mencegah penumpukan denda dan kemungkinan tilang',
+                    savings: formatCurrency(calculatedData.hasil * 0.25)
+                });
+            }
+
+            // Vehicle Age Analysis
+            const currentYear = new Date().getFullYear();
+            const vehicleAge = currentYear - (parseInt(formData.tahun_kendaraan) || currentYear - 5);
+            
+            if (vehicleAge > 5) {
+                const depreciationRate = Math.min(vehicleAge * 0.05, 0.3);
+                const nextYearTax = calculatedData.pkbPokok * (1 - depreciationRate);
+                
+                insights.trends.push({
+                    type: 'positive',
+                    title: 'Proyeksi Penurunan Pajak Tahun Depan',
+                    description: `AI memprediksi pajak kendaraan Anda akan turun menjadi sekitar ${formatCurrency(nextYearTax)} tahun depan karena faktor usia kendaraan.`,
+                    impact: formatCurrency(calculatedData.pkbPokok - nextYearTax)
+                });
+            }
+
+            // Payment Amount Analysis
+            if (calculatedData.hasil > 1000000) {
+                insights.recommendations.push({
+                    priority: 'medium',
+                    action: 'Pertimbangkan Cicilan',
+                    reason: 'Beberapa SAMSAT menyediakan program cicilan untuk pajak di atas 1 juta',
+                    benefit: 'Meringankan beban finansial'
+                });
+            }
+
+            // Location-based Analysis
+            if (formData.lokasi_domisili && formData.lokasi_domisili.toLowerCase().includes('jakarta')) {
+                insights.smartAlerts.push({
+                    type: 'info',
+                    title: 'Alert Lokasi Jakarta',
+                    message: 'Berlaku aturan ganjil-genap. Pastikan pajak dan STNK up-to-date untuk menghindari tilang.'
+                });
+            }
+
+            // Engine Capacity Analysis
+            const ccEngine = parseInt(formData.cc_engine) || 0;
+            if (ccEngine > 1500 && formData.jns_kend === 'R4') {
+                insights.trends.push({
+                    type: 'neutral',
+                    title: 'Kategori Pajak Premium',
+                    description: `Kendaraan dengan mesin ${ccEngine}cc termasuk kategori pajak tinggi. AI merekomendasikan untuk mempertimbangkan kendaraan hybrid di masa depan.`,
+                    impact: 'Potensi penghematan 30-40% pajak'
+                });
+            }
+
+            // Payment Timing
+            const today = new Date();
+            const paymentMonth = today.getMonth();
+            if (paymentMonth >= 10) {
+                insights.recommendations.push({
+                    priority: 'low',
+                    action: 'Bayar Sebelum Akhir Tahun',
+                    reason: 'Menghindari rush pembayaran awal tahun dan potensi antrian panjang',
+                    benefit: 'Efisiensi waktu'
+                });
+            }
+
+            return insights;
+        }
+
+// Form submission (integrasi dengan backend AI)
+document.getElementById('taxForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    // Show loading state
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('btnText');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+
+    submitBtn.disabled = true;
+    btnText.textContent = 'AI Sedang Menganalisis...';
+    loadingSpinner.classList.remove('hidden');
+
+    // Ambil data form
+    const formData = {
+        jns_kend: document.getElementById('jns_kend').value,
+        pkb_pokok: document.getElementById('pkb_pokok').value,
+        m_berlaku: document.getElementById('m_berlaku').value,
+        m_stnk: document.getElementById('m_stnk').value,
+        tahun_kendaraan: document.getElementById('tahun_kendaraan').value,
+        cc_engine: document.getElementById('cc_engine').value,
+        lokasi_domisili: document.getElementById('lokasi_domisili').value
+    };
+
+    // Validasi input wajib
+    if (!formData.jns_kend || !formData.pkb_pokok || !formData.m_berlaku || !formData.m_stnk) {
+        alert('Mohon lengkapi semua field yang wajib diisi!');
+        resetButton();
+        return;
+    }
+
+    try {
+        // Hitung usia kendaraan
+        const currentYear = new Date().getFullYear();
+        const usia_kend = formData.tahun_kendaraan
+            ? currentYear - parseInt(formData.tahun_kendaraan)
+            : 5; // default 5 tahun kalau kosong
+
+        // Hitung tunggakan tahun
+        const telatPajak = calculateYearsDifference(formData.m_berlaku, new Date());
+
+        // Payload untuk backend
+        const payload = {
+            jns_kend: formData.jns_kend,
+            pkb_pokok: parseInt(formData.pkb_pokok),
+            usia_kend: usia_kend,
+            tunggakan_tahun: telatPajak
+        };
+
+        // 🔗 Panggil API FastAPI backend
+        const response = await fetch("http://127.0.0.1:8000/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            throw new Error("Gagal memanggil API backend");
+        }
+
+        const result = await response.json();
+
+        // Bentuk data hasil perhitungan
+        const calculatedData = {
+            jns_kend: formData.jns_kend,
+            pkbPokok: payload.pkb_pokok,
+            telatPajak: payload.tunggakan_tahun,
+            hasil: result.predicted_total
+        };
+
+        // Gunakan AI Insights lokal (opsional)
+        const aiInsights = generateAIInsights(calculatedData, formData);
+
+        // Tampilkan hasil ke UI
+        displayResults(calculatedData, aiInsights);
+
+    } catch (error) {
+        alert("Terjadi kesalahan: " + error.message);
+    } finally {
+        resetButton();
+    }
+});
+
+
+
+        function resetButton() {
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            
+            submitBtn.disabled = false;
+            btnText.textContent = '🧠 Analisis dengan AI';
+            loadingSpinner.classList.add('hidden');
+        }
+
+        function displayResults(data, insights) {
+            const resultsSection = document.getElementById('resultsSection');
+            
+            // Main result card with enhanced animations
+            let resultsHTML = `
+                <div class="main-result">
+                    <div class="result-title">🎉 ESTIMASI PAJAK ANDA ADALAH</div>
+                    <div class="total-amount">${formatCurrency(data.hasil)}</div>
+                    <div class="vehicle-info">
+                        <strong>${data.jns_kend === 'R2' ? '🏍️ Motor (R2)' : '🚗 Mobil (R4)'}</strong>
+                        | Masa Berlaku: ${new Date(data.m_berlaku).toLocaleDateString('id-ID')}
+                    </div>
+                </div>
+            `;
+
+            // AI Risk Assessment Card
+            resultsHTML += `
+                <div class="analysis-card risk-${insights.riskLevel}">
+                    <div class="analysis-header">
+                        <span style="font-size: 32px;">🧠</span>
+                        <h3 class="analysis-title">AI Risk Assessment</h3>
+                    </div>
+                    <div class="risk-indicator">
+                        <div class="risk-item">
+                            <div class="risk-label">Risk Level</div>
+                            <div class="risk-value">${insights.riskLevel}</div>
+                        </div>
+                        <div class="risk-item">
+                            <div class="risk-label">Tunggakan</div>
+                            <div class="risk-value">
+                                ${data.telatPajak > 1 ? `${data.telatPajak} Tahun` : 'Tidak Ada'}
+                            </div>
+                        </div>
+                        <div class="risk-item">
+                            <div class="risk-label">Status</div>
+                            <div class="risk-value">
+                                ${data.telatPajak > 1 ? 'Terlambat' : 'On Time'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // AI Insights Grid
+            resultsHTML += '<div class="insights-grid">';
+
+            // Predictions Card
+            if (insights.predictions.length > 0) {
+                resultsHTML += `
+                    <div class="insight-card">
+                        <div class="insight-header">
+                            <div class="insight-icon">🔮</div>
+                            <h3 class="insight-title">AI Predictions</h3>
+                        </div>
+                `;
+                insights.predictions.forEach(prediction => {
+                    resultsHTML += `
+                        <div class="prediction-item">
+                            <div class="item-title">${prediction.title}</div>
+                            <div class="item-description">${prediction.description}</div>
+                            <div class="item-meta">
+                                <span>Confidence: <strong>${prediction.confidence}%</strong></span>
+                            </div>
+                        </div>
+                    `;
+                });
+                resultsHTML += '</div>';
+            }
+
+            // Recommendations Card
+            if (insights.recommendations.length > 0) {
+                resultsHTML += `
+                    <div class="insight-card">
+                        <div class="insight-header">
+                            <div class="insight-icon">💡</div>
+                            <h3 class="insight-title">Smart Recommendations</h3>
+                        </div>
+                `;
+                insights.recommendations.forEach(rec => {
+                    resultsHTML += `
+                        <div class="recommendation-item ${rec.priority}">
+                            <div class="priority-badge badge-${rec.priority}">${rec.priority}</div>
+                            <div class="item-title">${rec.action}</div>
+                            <div class="item-description">${rec.reason}</div>
+                            <div class="item-meta">
+                                ${rec.savings ? `<span>💰 Hemat: <strong>${rec.savings}</strong></span>` : ''}
+                                ${rec.benefit ? `<span>✨ ${rec.benefit}</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                resultsHTML += '</div>';
+            }
+
+            // Trends Card
+            if (insights.trends.length > 0) {
+                resultsHTML += `
+                    <div class="insight-card">
+                        <div class="insight-header">
+                            <div class="insight-icon">📈</div>
+                            <h3 class="insight-title">Future Trends</h3>
+                        </div>
+                `;
+                insights.trends.forEach(trend => {
+                    resultsHTML += `
+                        <div class="trend-item">
+                            <div class="item-title">${trend.title}</div>
+                            <div class="item-description">${trend.description}</div>
+                            <div class="item-meta">
+                                ${trend.impact ? `<span>📊 Impact: <strong>${trend.impact}</strong></span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                resultsHTML += '</div>';
+            }
+
+            resultsHTML += '</div>'; // Close insights-grid
+
+            // Smart Alerts
+            if (insights.smartAlerts.length > 0) {
+                insights.smartAlerts.forEach(alert => {
+                    resultsHTML += `
+                        <div class="analysis-card" style="border-left-color: #667eea; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(255, 255, 255, 0.95) 100%);">
+                            <div class="analysis-header">
+                                <span style="font-size: 32px;">🚨</span>
+                                <h3 class="analysis-title">${alert.title}</h3>
+                            </div>
+                            <div style="color: #4a5568; line-height: 1.6; font-size: 1.1rem;">
+                                ${alert.message}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // Detailed Calculation Table
+            resultsHTML += `
+                <div class="analysis-card" style="border-left-color: #667eea;">
+                    <div class="analysis-header">
+                        <span style="font-size: 32px;">📊</span>
+                        <h3 class="analysis-title">Rincian Lengkap Perhitungan</h3>
+                    </div>
+                    <table class="calculation-table">
+                        <thead>
+                            <tr>
+                                <th>Komponen</th>
+                                <th>Nilai</th>
+                                <th>Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>📝 Jenis Kendaraan</strong></td>
+                                <td class="currency">${data.jns_kend === 'R2' ? 'R2 - Motor' : 'R4 - Mobil'}</td>
+                                <td><em>Kategori kendaraan</em></td>
+                            </tr>
+                            <tr>
+                                <td><strong>💵 PKB Pokok</strong></td>
+                                <td class="currency">${formatCurrency(data.pkbPokok)}</td>
+                                <td><em>Pajak Kendaraan Bermotor dasar</em></td>
+                            </tr>
+                            <tr>
+                                <td><strong>🎯 OPSEN</strong></td>
+                                <td class="currency">${formatCurrency(data.opsen)}</td>
+                                <td><em>66% dari PKB Pokok</em></td>
+                            </tr>
+                            <tr>
+                                <td><strong>⏱️ Tahun Tunggakan</strong></td>
+                                <td class="currency">${data.telatPajak} tahun</td>
+                                <td><em>${data.telatPajak > 1 ? `Telat ${data.telatPajak} tahun` : 'Tidak ada tunggakan'}</em></td>
+                            </tr>
+                            <tr>
+                                <td><strong>💰 PKB Total</strong></td>
+                                <td class="currency">${formatCurrency(data.pkbOutput)}</td>
+                                <td><em>(PKB + OPSEN) × ${data.telatPajak} tahun</em></td>
+                            </tr>
+                            <tr>
+                                <td><strong>🛡️ SWDKLLJ</strong></td>
+                                <td class="currency">${formatCurrency(data.swdkllj)}</td>
+                                <td><em>Dana Kecelakaan Lalu Lintas</em></td>
+                            </tr>
+                            <tr>
+                                <td><strong>🅿️ PL (Parkir)</strong></td>
+                                <td class="currency">${formatCurrency(data.pl)}</td>
+                                <td><em>Parkir Langganan</em></td>
+                            </tr>
+                            <tr>
+                                <td><strong>📄 Lain-lain</strong></td>
+                                <td class="currency">${formatCurrency(data.biayaAdmin)}</td>
+                                <td><em>Biaya administrasi</em></td>
+                            </tr>
+                            <tr class="total-row">
+                                <td><strong>🏆 ESTIMASI TOTAL PAJAK</strong></td>
+                                <td class="currency"><strong>${formatCurrency(data.hasil)}</strong></td>
+                                <td><strong>Total seluruh komponen pajak</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            resultsSection.innerHTML = resultsHTML;
+            resultsSection.classList.add('show');
+            
+            // Smooth scroll to results with delay for animation
+            setTimeout(() => {
+                resultsSection.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }, 300);
+        }
+    </script>
+</body>
+</html>
